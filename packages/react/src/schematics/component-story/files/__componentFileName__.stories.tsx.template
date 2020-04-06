@@ -1,0 +1,16 @@
+<% if(usedKnobs && usedKnobs.length > 0) { %>import { <%= usedKnobs %> } from '@storybook/addon-knobs';<% } %>
+import React from 'react';
+import { <%= componentName %>, <%= propsTypeName %> } from './<%= componentFileName %>';
+
+export default {
+  component: <%= componentName %>,
+  title: '<%= componentName %>'
+};
+
+export const primary = () => {
+  const props: <%= propsTypeName %> = {<% for (let prop of props) { %>
+    <%= prop.name %>: <%= prop.type %>('<%= prop.name %>', <%= prop.defaultValue %>),<% } %>
+  };
+
+  return <<%= componentName %> <% for (let prop of props) { %><%= prop.name %> = {props.<%= prop.name %>} <% } %> />;
+};

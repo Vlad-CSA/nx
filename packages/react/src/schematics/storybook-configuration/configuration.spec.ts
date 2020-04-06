@@ -1,11 +1,16 @@
-import { Tree, schematic, externalSchematic } from '@angular-devkit/schematics';
-import { runSchematic, callRule } from '../../utils/testing';
-import { StorybookConfigureSchema } from './schema';
+import { externalSchematic, Tree } from '@angular-devkit/schematics';
 import { createEmptyWorkspace } from '@nrwl/workspace/testing';
+import { callRule, runSchematic } from '../../utils/testing';
+import { StorybookConfigureSchema } from './schema';
 
 describe('react:storybook-configuration', () => {
+  let appTree;
+
+  beforeEach(async () => {
+    appTree = await createTestUILib('test-ui-lib');
+  });
+
   it('should configure everything at once', async () => {
-    const appTree = await createTestUILib('test-ui-lib');
     const tree = await runSchematic(
       'storybook-configuration',
       <StorybookConfigureSchema>{
@@ -20,6 +25,21 @@ describe('react:storybook-configuration', () => {
       tree.exists('libs/test-ui-lib/.storybook/tsconfig.json')
     ).toBeTruthy();
     expect(tree.exists('apps/test-ui-lib-e2e/cypress.json')).toBeTruthy();
+  });
+
+  it('should generate stories for components', async () => {
+    const tree = await runSchematic(
+      'storybook-configuration',
+      <StorybookConfigureSchema>{
+        name: 'test-ui-lib',
+        generateStories: true
+      },
+      appTree
+    );
+
+    expect(
+      tree.exists('libs/test-ui-lib/src/lib/test-ui-lib.stories.tsx')
+    ).toBeTruthy();
   });
 });
 
