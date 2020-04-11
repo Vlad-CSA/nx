@@ -8,6 +8,7 @@ import {
 import { getProjectConfig } from '@nrwl/workspace';
 import { join } from 'path';
 import { CreateComponentStoriesFileSchema } from '../component-story/component-story';
+import { CreateComponentSpecFileSchema } from '../component-cypress-spec/component-cypress-spec';
 
 export interface StorybookStoriesSchema {
   project: string;
@@ -38,10 +39,21 @@ export function createAllStories(
           ''
         );
 
-        return schematic<CreateComponentStoriesFileSchema>('component-story', {
-          componentPath: relativeCmpDir,
-          project: projectName
-        });
+        return chain([
+          schematic<CreateComponentStoriesFileSchema>('component-story', {
+            componentPath: relativeCmpDir,
+            project: projectName
+          }),
+          generateCypressSpecs
+            ? schematic<CreateComponentSpecFileSchema>(
+                'component-cypress-spec',
+                {
+                  project: projectName,
+                  componentPath: relativeCmpDir
+                }
+              )
+            : () => {}
+        ]);
       })
     );
   };

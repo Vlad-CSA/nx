@@ -58,6 +58,13 @@
       "schema": "./src/schematics/stories/schema.json",
       "description": "Create stories/specs for all components declared in a library",
       "hidden": false
+    },
+
+    "component-cypress-spec": {
+      "factory": "./src/schematics/component-cypress-spec/component-cypress-spec",
+      "schema": "./src/schematics/component-cypress-spec/schema.json",
+      "description": "Create a cypress spec for a ui component that has a story",
+      "hidden": false
     }
   }
 }

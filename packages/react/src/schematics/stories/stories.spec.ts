@@ -34,7 +34,9 @@ describe('react:stories', () => {
       export default Test;        
       `
     );
+  });
 
+  it('should create the stories', async () => {
     tree = await runSchematic(
       'stories',
       <StorybookStoriesSchema>{
@@ -42,14 +44,34 @@ describe('react:stories', () => {
       },
       appTree
     );
-  });
 
-  it('should create the stories', () => {
     expect(
       tree.exists('libs/test-ui-lib/src/lib/test-ui-lib.stories.tsx')
     ).toBeTruthy();
     expect(
       tree.exists('libs/test-ui-lib/src/lib/anothercmp/another-cmp.stories.tsx')
+    ).toBeTruthy();
+  });
+
+  it('should generate Cypress specs', async () => {
+    tree = await runSchematic(
+      'stories',
+      <StorybookStoriesSchema>{
+        project: 'test-ui-lib',
+        generateCypressSpecs: true
+      },
+      appTree
+    );
+
+    expect(
+      tree.exists(
+        'apps/test-ui-lib-e2e/src/integration/test-ui-lib/test-ui-lib.spec.ts'
+      )
+    ).toBeTruthy();
+    expect(
+      tree.exists(
+        'apps/test-ui-lib-e2e/src/integration/another-cmp/another-cmp.spec.ts'
+      )
     ).toBeTruthy();
   });
 });
@@ -60,6 +82,15 @@ export async function createTestUILib(libName: string): Promise<Tree> {
   appTree = await callRule(
     externalSchematic('@nrwl/react', 'library', {
       name: libName
+    }),
+    appTree
+  );
+
+  // create some Nx app that we'll use to generate the cypress
+  // spec into it. We don't need a real Cypress setup
+  appTree = await callRule(
+    externalSchematic('@nrwl/react', 'application', {
+      name: `${libName}-e2e`
     }),
     appTree
   );
